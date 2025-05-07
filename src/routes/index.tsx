@@ -10,6 +10,8 @@ import COAttainment from "@/pages/coordinator/COAttainment";
 
 // Associator pages
 import AssociatorHome from "@/pages/associator/Home";
+import SubjectBuilder from "@/pages/associator/SubjectBuilder";
+import Attendance from "@/pages/associator/Attendance";
 
 // HOD pages
 import HodDashboard from "@/pages/hod/Dashboard";
@@ -48,7 +50,7 @@ const routes: RouteObject[] = [
       },
       {
         path: "associator/subject-builder",
-        element: <div className="p-4">Subject Builder Page</div>,
+        element: <SubjectBuilder />,
       },
       {
         path: "associator/batches",
@@ -56,7 +58,7 @@ const routes: RouteObject[] = [
       },
       {
         path: "associator/attendance",
-        element: <div className="p-4">Attendance Page</div>,
+        element: <Attendance />,
       },
       {
         path: "associator/lab-attendance",
