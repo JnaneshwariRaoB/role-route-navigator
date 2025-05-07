@@ -2,7 +2,13 @@
 import React from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Select } from "@/components/ui/select";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Download, Filter } from "lucide-react";
 
@@ -13,22 +19,22 @@ const COAttainment = () => {
         <h1 className="text-2xl font-bold tracking-tight">CO Attainment</h1>
         <div className="flex gap-2">
           <Select defaultValue="2023-24">
-            <Select.Trigger className="w-[160px]">
-              <Select.Value placeholder="Academic Year" />
-            </Select.Trigger>
-            <Select.Content>
-              <Select.Item value="2023-24">2023-24</Select.Item>
-              <Select.Item value="2024-25">2024-25</Select.Item>
-            </Select.Content>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Academic Year" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="2023-24">2023-24</SelectItem>
+              <SelectItem value="2024-25">2024-25</SelectItem>
+            </SelectContent>
           </Select>
           <Select defaultValue="sem1">
-            <Select.Trigger className="w-[120px]">
-              <Select.Value placeholder="Semester" />
-            </Select.Trigger>
-            <Select.Content>
-              <Select.Item value="sem1">Semester 1</Select.Item>
-              <Select.Item value="sem2">Semester 2</Select.Item>
-            </Select.Content>
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Semester" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="sem1">Semester 1</SelectItem>
+              <SelectItem value="sem2">Semester 2</SelectItem>
+            </SelectContent>
           </Select>
           <Button size="icon" variant="outline">
             <Filter size={16} />
@@ -191,15 +197,15 @@ const COAttainment = () => {
                 <div className="flex justify-between mb-4">
                   <h3 className="text-lg font-medium">CO-wise Breakdown</h3>
                   <Select defaultValue="co1">
-                    <Select.Trigger className="w-[100px]">
-                      <Select.Value placeholder="Select CO" />
-                    </Select.Trigger>
-                    <Select.Content>
-                      <Select.Item value="co1">CO1</Select.Item>
-                      <Select.Item value="co2">CO2</Select.Item>
-                      <Select.Item value="co3">CO3</Select.Item>
-                      <Select.Item value="co4">CO4</Select.Item>
-                    </Select.Content>
+                    <SelectTrigger className="w-[100px]">
+                      <SelectValue placeholder="Select CO" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="co1">CO1</SelectItem>
+                      <SelectItem value="co2">CO2</SelectItem>
+                      <SelectItem value="co3">CO3</SelectItem>
+                      <SelectItem value="co4">CO4</SelectItem>
+                    </SelectContent>
                   </Select>
                 </div>
 

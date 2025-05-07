@@ -1,6 +1,12 @@
 
 import React from "react";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@/components/ui/select";
 import { useRole } from "@/hooks/useRole";
 
 const TopBar = () => {
@@ -17,14 +23,14 @@ const TopBar = () => {
             value={role}
             onValueChange={setRole}
           >
-            <Select.Trigger className="w-[200px] bg-white">
-              <Select.Value placeholder="Select Role" />
-            </Select.Trigger>
-            <Select.Content>
-              <Select.Item value="coordinator">Course Coordinator</Select.Item>
-              <Select.Item value="associator">Course Associator</Select.Item>
-              <Select.Item value="hod">HOD</Select.Item>
-            </Select.Content>
+            <SelectTrigger className="w-[200px] bg-white">
+              <SelectValue placeholder="Select Role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="coordinator">Course Coordinator</SelectItem>
+              <SelectItem value="associator">Course Associator</SelectItem>
+              <SelectItem value="hod">HOD</SelectItem>
+            </SelectContent>
           </Select>
         </div>
         <div className="flex items-center gap-2">
