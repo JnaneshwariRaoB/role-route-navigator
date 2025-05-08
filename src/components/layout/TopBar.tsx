@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Select,
@@ -12,6 +11,15 @@ import { useRole } from "@/hooks/useRole";
 const TopBar = () => {
   const { role, setRole } = useRole();
 
+  const handleRoleChange = (value: string) => {
+    setRole(value);
+
+    if (value === "associator") {
+      window.location.href = "https://subject-insight-tool.lovable.app/";
+    }
+    // "hod" and "coordinator" do not redirect
+  };
+
   return (
     <div className="w-full bg-white border-b border-gray-200 py-3 px-5 flex justify-between items-center shadow-sm">
       <div className="flex items-center">
@@ -21,7 +29,7 @@ const TopBar = () => {
         <div className="mr-4">
           <Select 
             value={role}
-            onValueChange={setRole}
+            onValueChange={handleRoleChange}
           >
             <SelectTrigger className="w-[200px] bg-white">
               <SelectValue placeholder="Select Role" />
