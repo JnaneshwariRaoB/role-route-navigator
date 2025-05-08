@@ -519,3 +519,15 @@ const SubjectBuilder = () => {
   const [isReligiousAccommodationsDialogOpen, setIsReligiousAccommodationsDialogOpen] = useState(false);
   const [religiousAccommodations, setReligiousAccommodations] = useState([
     { id: '1', accommodation: 'Accommodation 1', description: 'Description for Accommodation 1' },
+    { id: '2', accommodation: 'Accommodation 2', description: 'Description for Accommodation 2' },
+  ]);
+
+  return (
+    <div>
+      <h1>Subject Builder</h1>
+      <div>Content goes here</div>
+    </div>
+  );
+};
+
+export default SubjectBuilder;

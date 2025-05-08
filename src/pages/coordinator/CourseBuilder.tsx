@@ -19,7 +19,9 @@ import {
   Table, 
   Save,
   Plus,
-  X 
+  X,
+  ChevronDown,
+  ChevronUp 
 } from "lucide-react";
 import { 
   Table as UITable,
@@ -32,6 +34,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 const CourseBuilder = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -39,6 +42,7 @@ const CourseBuilder = () => {
   const [isAddingTarget, setIsAddingTarget] = useState(false);
   const [editedCourseOutcomes, setEditedCourseOutcomes] = useState([]);
   const [newTarget, setNewTarget] = useState({ level: "3", target: "", classTarget: "" });
+  const [expandedCard, setExpandedCard] = useState(null);
   
   // Sample courses data
   const courses = [
@@ -160,6 +164,15 @@ const CourseBuilder = () => {
     setIsEditing(false);
   };
 
+  // Toggle expanded card
+  const toggleExpandCard = (courseId) => {
+    if (expandedCard === courseId) {
+      setExpandedCard(null);
+    } else {
+      setExpandedCard(courseId);
+    }
+  };
+
   // Handle editing course outcomes
   const handleEditOutcome = (index, field, value) => {
     const updatedOutcomes = [...editedCourseOutcomes];
@@ -172,14 +185,20 @@ const CourseBuilder = () => {
     // In a real app, this would update the backend
     setIsEditing(false);
     // Show a success message
-    alert("Course outcomes updated successfully!");
+    toast.success("Course outcomes updated successfully!");
   };
 
   // Handle adding new target
   const handleAddTarget = () => {
+    if (!newTarget.target || !newTarget.classTarget) {
+      toast.error("Please fill in all target fields");
+      return;
+    }
+    
     setCourseTargets([...courseTargets, newTarget]);
     setIsAddingTarget(false);
     setNewTarget({ level: "3", target: "", classTarget: "" });
+    toast.success("Course target added successfully!");
   };
 
   // CIE marks data
@@ -195,6 +214,7 @@ const CourseBuilder = () => {
       student.id === studentId ? { ...student, [test]: parseInt(value) || 0 } : student
     );
     setCieMarks(updatedMarks);
+    toast.success(`Mark updated for student ${studentId}`);
   };
 
   return (
@@ -220,7 +240,11 @@ const CourseBuilder = () => {
               <SelectItem value="sem2">Semester 2</SelectItem>
             </SelectContent>
           </Select>
-          <Button size="icon" variant="outline" className="hover:bg-gray-100 active:bg-gray-200 transition-colors">
+          <Button 
+            size="icon" 
+            variant="outline" 
+            className="hover:bg-gray-100 active:bg-gray-200 transition-colors"
+          >
             <Filter size={16} />
           </Button>
         </div>
@@ -228,7 +252,10 @@ const CourseBuilder = () => {
 
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {courses.map((course) => (
-          <Card key={course.id} className="overflow-hidden hover:shadow-md transition-shadow">
+          <Card 
+            key={course.id} 
+            className="overflow-hidden hover:shadow-md transition-shadow"
+          >
             <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-3 text-white">
               <div className="flex justify-between items-center">
                 <div>
@@ -240,11 +267,44 @@ const CourseBuilder = () => {
               </div>
             </div>
             <CardContent className="p-4">
-              <h3 className="font-medium text-lg mb-1">{course.code} - {course.name}</h3>
-              <div className="mb-2 flex justify-between">
+              <div className="flex justify-between items-center mb-2">
+                <h3 className="font-medium text-lg">{course.code} - {course.name}</h3>
+                <Button 
+                  size="sm"
+                  variant="ghost"
+                  className="p-1 h-auto" 
+                  onClick={() => toggleExpandCard(course.id)}
+                >
+                  {expandedCard === course.id ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                </Button>
+              </div>
+              
+              <div className={`transition-all duration-300 ${expandedCard === course.id ? "max-h-96 opacity-100" : "max-h-0 opacity-0 overflow-hidden"}`}>
+                <div className="mb-2 grid grid-cols-2 gap-2 text-sm">
+                  <div className="bg-gray-50 p-2 rounded">
+                    <p className="font-medium">Category:</p>
+                    <p>{course.category}</p>
+                  </div>
+                  <div className="bg-gray-50 p-2 rounded">
+                    <p className="font-medium">Credits:</p>
+                    <p>{course.credits}</p>
+                  </div>
+                </div>
+                <div className="mb-3">
+                  <h4 className="text-sm font-medium mb-1">Course Outcomes:</h4>
+                  <ul className="text-xs text-gray-600 space-y-1 pl-4 list-disc">
+                    {course.outcomes.map((outcome) => (
+                      <li key={outcome.id}>{outcome.id}: {outcome.description}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              
+              <div className={`mb-2 flex justify-between ${expandedCard === course.id ? "mt-4" : "mt-0"}`}>
                 <p className="text-sm text-gray-500">Category: {course.category}</p>
                 <p className="text-sm font-medium">Credits: {course.credits}</p>
               </div>
+              
               <div className="mb-3">
                 <h4 className="text-sm font-medium mb-1">Course Outcomes:</h4>
                 <ul className="text-xs text-gray-600 space-y-1 pl-4 list-disc">
@@ -254,6 +314,7 @@ const CourseBuilder = () => {
                   {course.outcomes.length > 2 && <li className="text-gray-500">+ {course.outcomes.length - 2} more</li>}
                 </ul>
               </div>
+              
               <div className="flex gap-2">
                 <Button 
                   size="sm" 
@@ -309,7 +370,13 @@ const CourseBuilder = () => {
                   <h3 className="text-lg font-medium">Course Outcomes</h3>
                   <Button 
                     variant="outline" 
-                    onClick={() => setIsEditing(!isEditing)}
+                    onClick={() => {
+                      if (isEditing) {
+                        handleSaveOutcomes();
+                      } else {
+                        setIsEditing(!isEditing);
+                      }
+                    }}
                     className="hover:bg-indigo-50 active:bg-indigo-100 transition-colors"
                   >
                     {isEditing ? <Save size={16} className="mr-1" /> : <Edit size={16} className="mr-1" />}
@@ -394,6 +461,23 @@ const CourseBuilder = () => {
                     </div>
                   </div>
                 )}
+                
+                {isEditing && (
+                  <div className="mt-4">
+                    <Button 
+                      variant="outline"
+                      className="hover:bg-green-50 active:bg-green-100 transition-colors"
+                      onClick={() => {
+                        setEditedCourseOutcomes([
+                          ...editedCourseOutcomes, 
+                          { id: `CO${editedCourseOutcomes.length + 1}`, description: '', level: 'Level 3 - Apply' }
+                        ]);
+                      }}
+                    >
+                      <Plus size={16} className="mr-1" /> Add Course Outcome
+                    </Button>
+                  </div>
+                )}
               </TabsContent>
 
               <TabsContent value="bloom">
@@ -403,6 +487,7 @@ const CourseBuilder = () => {
                     <Button 
                       variant="outline"
                       className="hover:bg-indigo-50 active:bg-indigo-100 transition-colors"
+                      onClick={() => setIsEditing(true)}
                     >
                       <Edit size={16} className="mr-1" /> Edit
                     </Button>
@@ -546,7 +631,7 @@ const CourseBuilder = () => {
               <TabsContent value="cie">
                 <div className="space-y-4">
                   <div className="flex justify-between mb-4">
-                    <h3 className="text-lg font-medium">CIE Marks Entry</h3>
+                    <h3 className="text-lg font-medium">CIE Marks Entry for {selectedCourse.code} - {selectedCourse.name}</h3>
                     <div className="flex gap-2">
                       <Button 
                         variant="outline"
@@ -557,6 +642,7 @@ const CourseBuilder = () => {
                       <Button 
                         variant="outline"
                         className="hover:bg-indigo-50 active:bg-indigo-100 transition-colors"
+                        onClick={() => toast.success("Marks saved successfully!")}
                       >
                         <Save size={16} className="mr-1" /> Save Changes
                       </Button>
@@ -621,6 +707,26 @@ const CourseBuilder = () => {
                       })}
                     </tbody>
                   </table>
+
+                  <div className="flex justify-center mt-6">
+                    <Button 
+                      onClick={() => {
+                        const newStudent = { 
+                          id: cieMarks.length + 1, 
+                          usn: `CS00${cieMarks.length + 1}`, 
+                          name: `New Student ${cieMarks.length + 1}`, 
+                          test1: 0, 
+                          test2: 0, 
+                          test3: 0 
+                        };
+                        setCieMarks([...cieMarks, newStudent]);
+                        toast.success("New student added!");
+                      }}
+                      className="hover:bg-indigo-600 active:bg-indigo-700 transition-colors"
+                    >
+                      <Plus size={16} className="mr-1" /> Add Student
+                    </Button>
+                  </div>
                 </div>
               </TabsContent>
               
@@ -732,8 +838,65 @@ const CourseBuilder = () => {
               </TabsContent>
               
               <TabsContent value="preview">
-                <h3 className="text-lg font-medium mb-4">Preview</h3>
-                <p className="text-gray-500">Preview content will be displayed here.</p>
+                <h3 className="text-lg font-medium mb-4">Preview of {selectedCourse.code} - {selectedCourse.name}</h3>
+                <div className="space-y-6">
+                  <div className="p-4 border rounded-lg bg-gray-50">
+                    <h4 className="font-medium mb-2">Course Information</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+                      <div>
+                        <span className="text-gray-500">Course Code:</span> {selectedCourse.code}
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Name:</span> {selectedCourse.name}
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Credits:</span> {selectedCourse.credits}
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Category:</span> {selectedCourse.category}
+                      </div>
+                      <div>
+                        <span className="text-gray-500">Semester:</span> {selectedCourse.semester}
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="p-4 border rounded-lg">
+                    <h4 className="font-medium mb-2">Course Outcomes</h4>
+                    <table className="w-full border-collapse text-sm">
+                      <thead>
+                        <tr className="bg-gray-50">
+                          <th className="border p-2 text-left">ID</th>
+                          <th className="border p-2 text-left">Description</th>
+                          <th className="border p-2 text-left">Bloom's Level</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {selectedCourse.outcomes.map(outcome => (
+                          <tr key={outcome.id}>
+                            <td className="border p-2">{outcome.id}</td>
+                            <td className="border p-2">{outcome.description}</td>
+                            <td className="border p-2">{outcome.level}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  
+                  <div className="flex justify-end gap-2">
+                    <Button 
+                      variant="outline"
+                      className="hover:bg-indigo-50 active:bg-indigo-100 transition-colors"
+                    >
+                      <FileText size={16} className="mr-1" /> Export PDF
+                    </Button>
+                    <Button
+                      className="hover:bg-indigo-600 active:bg-indigo-700 transition-colors"
+                    >
+                      <Save size={16} className="mr-1" /> Save Preview
+                    </Button>
+                  </div>
+                </div>
               </TabsContent>
             </Tabs>
           </CardContent>
