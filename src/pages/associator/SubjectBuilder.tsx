@@ -1,706 +1,521 @@
-
-import React, { useState } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Card,
-  CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+  CardDescription,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/components/ui/select"
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { toast } from "sonner"
+import { Progress } from "@/components/ui/progress"
+import { Badge } from "@/components/ui/badge"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Calendar } from "@/components/ui/calendar"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
-import { Book, CalendarDays } from "lucide-react";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "@/components/ui/command"
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
+import { Slider } from "@/components/ui/slider"
+import { Switch } from "@/components/ui/switch"
+import { ModeToggle } from "@/components/ModeToggle"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Skeleton } from "@/components/ui/skeleton"
+import { useToast } from "@/components/ui/use-toast"
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import * as Collapsible from "@radix-ui/react-collapsible"
+import { Circle } from 'lucide-react';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardDescription,
+  HoverCardHeader,
+  HoverCardTitle,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card"
+import { AspectRatio } from "@/components/ui/aspect-ratio"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import * as NavigationMenu from "@radix-ui/react-navigation-menu"
+import { MoreVertical, Copy, Mail, Github, ExternalLink } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from "@/components/ui/context-menu"
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable"
+import { CalendarDateRangePicker } from "@/components/ui/calendar-date-range-picker"
+import { Pagination } from "@/components/ui/pagination"
+import { usePagination } from "@/hooks/use-pagination"
+import { InputWithButton } from "@/components/ui/input-with-button"
+import { CommandMenu } from "@/components/ui/command-menu"
+import { DataTable } from "@/components/ui/data-table"
+import { DataTableViewOptions } from "@/components/ui/data-table-view-options"
+import { FileTree } from "@/components/ui/file-tree"
+import { Kbd } from "@/components/ui/kbd"
+import { Link } from "react-router-dom"
+import { Icons } from "@/components/icons"
+import { useRole } from "@/hooks/useRole";
+
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: 'open' | 'inProgress' | 'completed';
+}
+
+interface Student {
+  id: string;
+  name: string;
+  usn: string;
+  email: string;
+  phone: string;
+}
 
 const SubjectBuilder = () => {
-  const [academicYear, setAcademicYear] = useState("");
-  const [semester, setSemester] = useState("");
-  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
-  const [activeTab, setActiveTab] = useState("course-outcome");
-  const [activeModule, setActiveModule] = useState("module-1");
+  const [tasks, setTasks] = useState<Task[]>([
+    { id: '1', title: 'Task 1', description: 'Description for Task 1', status: 'open' },
+    { id: '2', title: 'Task 2', description: 'Description for Task 2', status: 'inProgress' },
+    { id: '3', title: 'Task 3', description: 'Description for Task 3', status: 'completed' },
+  ]);
 
-  // Mock data for subjects
-  const subjects = [
-    {
-      id: "cs301",
-      name: "Data Structures",
-      code: "CS301",
-      nbaCode: "NBA-CS-301",
-      category: "Core",
-      students: 60,
-      type: "Theory",
-      hours: {
-        theory: 3,
-        tutorial: 1,
-        practical: 2,
-        sda: 1
-      },
-      exam: {
-        duration: 3,
-        cie: 50,
-        see: 50,
-        total: 100
-      },
-      credits: 4
-    },
-    {
-      id: "cs302",
-      name: "Database Management Systems",
-      code: "CS302",
-      nbaCode: "NBA-CS-302",
-      category: "Core",
-      students: 55,
-      type: "Theory/Drawing",
-      hours: {
-        theory: 3,
-        tutorial: 1,
-        practical: 0,
-        sda: 1
-      },
-      exam: {
-        duration: 3,
-        cie: 50,
-        see: 50,
-        total: 100
-      },
-      credits: 3
-    },
-    {
-      id: "cs303",
-      name: "Computer Networks",
-      code: "CS303",
-      nbaCode: "NBA-CS-303",
-      category: "Core",
-      students: 58,
-      type: "PBS",
-      hours: {
-        theory: 3,
-        tutorial: 0,
-        practical: 2,
-        sda: 1
-      },
-      exam: {
-        duration: 3,
-        cie: 50,
-        see: 50,
-        total: 100
-      },
-      credits: 4
-    }
-  ];
+  const [students, setStudents] = useState<Student[]>([
+    { id: '1', name: 'John Doe', usn: '1CG20CS001', email: 'john.doe@example.com', phone: '123-456-7890' },
+    { id: '2', name: 'Jane Smith', usn: '1CG20CS002', email: 'jane.smith@example.com', phone: '987-654-3210' },
+    { id: '3', name: 'Alice Johnson', usn: '1CG20CS003', email: 'alice.johnson@example.com', phone: '555-123-4567' },
+  ]);
 
-  // Mock data for CO-PO mapping
-  const courseOutcomes = [
-    { id: "CO1", description: "Understand data structure concepts and algorithms", bloomLevel: "Level 2 - Understanding" },
-    { id: "CO2", description: "Apply data structures to solve computing problems", bloomLevel: "Level 3 - Applying" },
-    { id: "CO3", description: "Analyze the performance of algorithms", bloomLevel: "Level 4 - Analyzing" },
-    { id: "CO4", description: "Evaluate different data structures for specific problems", bloomLevel: "Level 5 - Evaluating" },
-    { id: "CO5", description: "Create efficient algorithms using appropriate data structures", bloomLevel: "Level 6 - Creating" }
-  ];
-
-  const programOutcomes = Array.from({ length: 12 }, (_, i) => `PO${i + 1}`);
-
-  const coPoMapping = [
-    [3, 2, 3, 1, 0, 0, 2, 0, 0, 0, 0, 0],
-    [2, 3, 1, 2, 0, 1, 0, 0, 0, 0, 0, 0],
-    [3, 1, 2, 3, 0, 0, 1, 0, 0, 0, 0, 0],
-    [1, 2, 3, 2, 1, 0, 0, 0, 0, 0, 0, 0],
-    [2, 3, 2, 1, 0, 1, 0, 0, 0, 0, 0, 0]
-  ];
-
-  // Calculate totals for CO-PO mapping
-  const totals = Array.from({ length: 12 }, (_, colIndex) => 
-    coPoMapping.reduce((sum, row) => sum + row[colIndex], 0)
-  );
-
-  // Calculate averages for CO-PO mapping
-  const averages = totals.map(total => (total / courseOutcomes.length).toFixed(1));
-
-  // Mock data for course targets
-  const courseTargets = [
-    { level: 3, targetPercentage: 40, classTargetPercentage: 35 },
-    { level: 2, targetPercentage: 35, classTargetPercentage: 40 },
-    { level: 1, targetPercentage: 25, classTargetPercentage: 25 },
-  ];
-
-  // Mock data for lesson plan
-  const modules = [
-    { id: "module-1", title: "Introduction to Data Structures", outcomes: ["CO1"], hours: 8 },
-    { id: "module-2", title: "Arrays and Linked Lists", outcomes: ["CO1", "CO2"], hours: 10 },
-    { id: "module-3", title: "Stacks and Queues", outcomes: ["CO2", "CO3"], hours: 8 },
-    { id: "module-4", title: "Trees", outcomes: ["CO3", "CO4"], hours: 12 },
-    { id: "module-5", title: "Graphs", outcomes: ["CO4", "CO5"], hours: 10 },
-  ];
-
-  const lessonPlanItems = [
-    { topic: "Data Structure Types and Operations", mode: "Chalk and Talk", date: new Date(2024, 5, 10) },
-    { topic: "Time and Space Complexity", mode: "PPT", date: new Date(2024, 5, 12) },
-    { topic: "Array Implementation and Applications", mode: "Activity", date: new Date(2024, 5, 15) },
-  ];
-
-  // Helper function to get cell background color based on mapping value
-  const getMappingCellColor = (value: number) => {
-    switch(value) {
-      case 3: return "bg-green-100";
-      case 2: return "bg-purple-100";
-      case 1: return "bg-pink-100";
-      default: return "bg-gray-50";
-    }
-  };
-
-  // Filter subjects based on academic year and semester
-  const filteredSubjects = (academicYear && semester) ? subjects : [];
-
-  return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">Subject Builder</h1>
-
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
-        <div className="w-full md:w-1/2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year</label>
-          <Select value={academicYear} onValueChange={setAcademicYear}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Academic Year" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="2022-2026">2022-2026</SelectItem>
-              <SelectItem value="2023-2027">2023-2027</SelectItem>
-              <SelectItem value="2024-2028">2024-2028</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="w-full md:w-1/2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
-          <Select value={semester} onValueChange={setSemester}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select Semester" />
-            </SelectTrigger>
-            <SelectContent>
-              {[3, 4, 5, 6, 7, 8].map((sem) => (
-                <SelectItem key={sem} value={sem.toString()}>{`${sem}${
-                  sem === 3 ? "rd" : sem === 4 ? "th" : sem === 5 ? "th" : sem === 6 ? "th" : sem === 7 ? "th" : "th"
-                } Semester`}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {academicYear && semester ? (
-        <>
-          {selectedSubject ? (
-            <div className="mb-6">
-              <Button
-                variant="outline"
-                className="mb-4"
-                onClick={() => setSelectedSubject(null)}
-              >
-                ← Back to Subjects
-              </Button>
-
-              {/* Subject details sections */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                {/* General Info */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">General Information</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">NBA Code:</span>
-                        <span className="font-medium">{subjects.find(s => s.id === selectedSubject)?.nbaCode}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Course Code:</span>
-                        <span className="font-medium">{subjects.find(s => s.id === selectedSubject)?.code}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Course Type:</span>
-                        <span className="font-medium">{subjects.find(s => s.id === selectedSubject)?.type}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Teaching Hours */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Teaching Hours (per week)</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Theory:</span>
-                        <span className="font-medium">{subjects.find(s => s.id === selectedSubject)?.hours.theory}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Tutorial:</span>
-                        <span className="font-medium">{subjects.find(s => s.id === selectedSubject)?.hours.tutorial}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Practical:</span>
-                        <span className="font-medium">{subjects.find(s => s.id === selectedSubject)?.hours.practical}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">SDA:</span>
-                        <span className="font-medium">{subjects.find(s => s.id === selectedSubject)?.hours.sda}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Examination */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Examination Structure</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-1 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Duration (hrs):</span>
-                        <span className="font-medium">{subjects.find(s => s.id === selectedSubject)?.exam.duration}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">CIE Marks:</span>
-                        <span className="font-medium">{subjects.find(s => s.id === selectedSubject)?.exam.cie}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">SEE Marks:</span>
-                        <span className="font-medium">{subjects.find(s => s.id === selectedSubject)?.exam.see}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-500">Total Marks:</span>
-                        <span className="font-medium">{subjects.find(s => s.id === selectedSubject)?.exam.total}</span>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Credits */}
-                <Card>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-sm">Course Credits</CardTitle>
-                  </CardHeader>
-                  <CardContent className="flex items-center justify-center">
-                    <div className="text-3xl font-bold text-indigo-700">
-                      {subjects.find(s => s.id === selectedSubject)?.credits}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              {/* Tabs for course sections */}
-              <Tabs defaultValue="course-outcome" value={activeTab} onValueChange={setActiveTab}>
-                <TabsList className="mb-4">
-                  <TabsTrigger value="course-outcome">Course Outcome</TabsTrigger>
-                  <TabsTrigger value="lesson-plan">Lesson Plan</TabsTrigger>
-                  <TabsTrigger value="assignments">Assignments</TabsTrigger>
-                  <TabsTrigger value="course-books">Course Books</TabsTrigger>
-                  <TabsTrigger value="assessment">Assessment Responses</TabsTrigger>
-                </TabsList>
-
-                {/* Course Outcome Tab */}
-                <TabsContent value="course-outcome" className="space-y-6">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Course Outcomes</CardTitle>
-                      <CardDescription>Course outcomes with their respective Bloom's Taxonomy levels</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>CO ID</TableHead>
-                            <TableHead className="w-full">Description</TableHead>
-                            <TableHead>Bloom's Level</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {courseOutcomes.map((co) => (
-                            <TableRow key={co.id}>
-                              <TableCell className="font-medium">{co.id}</TableCell>
-                              <TableCell>{co.description}</TableCell>
-                              <TableCell>{co.bloomLevel}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Course Target</CardTitle>
-                      <CardDescription>Target percentages for different course levels</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Level</TableHead>
-                            <TableHead>Target Percentage</TableHead>
-                            <TableHead>Class Target Percentage</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {courseTargets.map((target) => (
-                            <TableRow key={target.level}>
-                              <TableCell className="font-medium">Level {target.level}</TableCell>
-                              <TableCell>{target.targetPercentage}%</TableCell>
-                              <TableCell>{target.classTargetPercentage}%</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-
-                  <Card>
-                    <CardHeader>
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <CardTitle>CO-PO Mapping</CardTitle>
-                          <CardDescription>Mapping between course outcomes and program outcomes</CardDescription>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm">Export PDF</Button>
-                          <Button variant="outline" size="sm">Export Excel</Button>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="overflow-x-auto">
-                      <div className="min-w-[800px]">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="sticky left-0 bg-white">CO ID</TableHead>
-                              {programOutcomes.map((po) => (
-                                <TableHead key={po}>{po}</TableHead>
-                              ))}
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {courseOutcomes.map((co, rowIndex) => (
-                              <TableRow key={co.id}>
-                                <TableCell className="font-medium sticky left-0 bg-white">{co.id}</TableCell>
-                                {coPoMapping[rowIndex].map((value, colIndex) => (
-                                  <TableCell 
-                                    key={colIndex} 
-                                    className={`text-center ${getMappingCellColor(value)}`}
-                                  >
-                                    {value > 0 ? value : ""}
-                                  </TableCell>
-                                ))}
-                              </TableRow>
-                            ))}
-                            <TableRow className="bg-yellow-50">
-                              <TableCell className="font-medium sticky left-0 bg-yellow-50">Total</TableCell>
-                              {totals.map((total, index) => (
-                                <TableCell key={index} className="text-center font-medium">
-                                  {total}
-                                </TableCell>
-                              ))}
-                            </TableRow>
-                            <TableRow className="bg-yellow-50">
-                              <TableCell className="font-medium sticky left-0 bg-yellow-50">Average</TableCell>
-                              {averages.map((avg, index) => (
-                                <TableCell key={index} className="text-center font-medium">
-                                  {avg}
-                                </TableCell>
-                              ))}
-                            </TableRow>
-                          </TableBody>
-                        </Table>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
-                {/* Lesson Plan Tab */}
-                <TabsContent value="lesson-plan">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                    <div className="col-span-1">
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <h3 className="text-lg font-medium mb-4">Modules</h3>
-                        <div className="space-y-2">
-                          {modules.map((module) => (
-                            <div 
-                              key={module.id}
-                              className={`p-3 rounded-md cursor-pointer ${
-                                activeModule === module.id ? 'bg-indigo-100 text-indigo-700' : 'bg-white hover:bg-gray-100'
-                              }`}
-                              onClick={() => setActiveModule(module.id)}
-                            >
-                              <div className="font-medium">{module.title}</div>
-                              <div className="text-xs text-gray-500 mt-1">
-                                {module.outcomes.join(", ")} • {module.hours} hours
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="col-span-1 md:col-span-3">
-                      <Card>
-                        <CardHeader>
-                          <CardTitle>
-                            {modules.find(m => m.id === activeModule)?.title}
-                          </CardTitle>
-                          <CardDescription>
-                            Course Outcomes: {modules.find(m => m.id === activeModule)?.outcomes.join(", ")} • 
-                            Hours: {modules.find(m => m.id === activeModule)?.hours}
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent>
-                          <Table>
-                            <TableHeader>
-                              <TableRow>
-                                <TableHead>Topic Name</TableHead>
-                                <TableHead>Mode of Delivery</TableHead>
-                                <TableHead>Date</TableHead>
-                              </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                              {lessonPlanItems.map((item, index) => (
-                                <TableRow key={index}>
-                                  <TableCell>{item.topic}</TableCell>
-                                  <TableCell>
-                                    <Select defaultValue={item.mode}>
-                                      <SelectTrigger>
-                                        <SelectValue />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        <SelectItem value="Chalk and Talk">Chalk and Talk</SelectItem>
-                                        <SelectItem value="Activity">Activity</SelectItem>
-                                        <SelectItem value="PPT">PPT</SelectItem>
-                                        <SelectItem value="Case Study">Case Study</SelectItem>
-                                        <SelectItem value="Peer-to-peer">Peer-to-peer</SelectItem>
-                                      </SelectContent>
-                                    </Select>
-                                  </TableCell>
-                                  <TableCell>
-                                    <Popover>
-                                      <PopoverTrigger asChild>
-                                        <Button variant="outline" className="w-full justify-start text-left font-normal">
-                                          <CalendarDays className="mr-2 h-4 w-4" />
-                                          {item.date ? format(item.date, "PPP") : "Select date"}
-                                        </Button>
-                                      </PopoverTrigger>
-                                      <PopoverContent className="w-auto p-0">
-                                        <Calendar
-                                          mode="single"
-                                          selected={selectedDate}
-                                          onSelect={setSelectedDate}
-                                          initialFocus
-                                          className="p-3 pointer-events-auto"
-                                        />
-                                      </PopoverContent>
-                                    </Popover>
-                                  </TableCell>
-                                </TableRow>
-                              ))}
-                              <TableRow>
-                                <TableCell colSpan={3}>
-                                  <Button variant="outline" className="w-full">
-                                    + Add New Topic
-                                  </Button>
-                                </TableCell>
-                              </TableRow>
-                            </TableBody>
-                          </Table>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </div>
-                </TabsContent>
-
-                {/* Assignments Tab */}
-                <TabsContent value="assignments">
-                  <Card>
-                    <CardHeader>
-                      <div className="flex justify-between items-center">
-                        <CardTitle>Assignments</CardTitle>
-                        <Button>New Assignment</Button>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-center py-8 text-gray-500">
-                        No assignments created yet.
-                      </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
-                {/* Course Books Tab */}
-                <TabsContent value="course-books">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Course Books</CardTitle>
-                      <CardDescription>Reference and textbooks for this course</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Type</TableHead>
-                            <TableHead>Title</TableHead>
-                            <TableHead>ISBN</TableHead>
-                            <TableHead>Author</TableHead>
-                            <TableHead className="w-20"></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          <TableRow>
-                            <TableCell>Textbook</TableCell>
-                            <TableCell>Data Structures and Algorithms in Java</TableCell>
-                            <TableCell>978-0672324536</TableCell>
-                            <TableCell>Robert Lafore</TableCell>
-                            <TableCell>
-                              <Button variant="ghost" size="sm">Edit</Button>
-                            </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>Reference</TableCell>
-                            <TableCell>Introduction to Algorithms</TableCell>
-                            <TableCell>978-0262033848</TableCell>
-                            <TableCell>Thomas H. Cormen et al.</TableCell>
-                            <TableCell>
-                              <Button variant="ghost" size="sm">Edit</Button>
-                            </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell colSpan={5}>
-                              <Button variant="outline" className="w-full">
-                                + Add New Book
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-
-                {/* Assessment Responses Tab */}
-                <TabsContent value="assessment">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Assessment Responses</CardTitle>
-                      <CardDescription>Student responses to assessment questions</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Question</TableHead>
-                            <TableHead>Responses</TableHead>
-                            <TableHead className="w-20"></TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          <TableRow>
-                            <TableCell>Explain the difference between arrays and linked lists</TableCell>
-                            <TableCell>45 responses</TableCell>
-                            <TableCell>
-                              <Button variant="ghost" size="sm">View</Button>
-                            </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>Implement a stack using an array</TableCell>
-                            <TableCell>42 responses</TableCell>
-                            <TableCell>
-                              <Button variant="ghost" size="sm">View</Button>
-                            </TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>Describe the time complexity of binary search</TableCell>
-                            <TableCell>38 responses</TableCell>
-                            <TableCell>
-                              <Button variant="ghost" size="sm">View</Button>
-                            </TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
-              </Tabs>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-              {filteredSubjects.map((subject) => (
-                <Card key={subject.id} className="hover:shadow-md transition-shadow">
-                  <CardHeader>
-                    <CardTitle>{subject.name}</CardTitle>
-                    <CardDescription>
-                      <div className="flex flex-wrap gap-2 mt-1">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          {subject.code}
-                        </span>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-                          {subject.nbaCode}
-                        </span>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          {subject.category}
-                        </span>
-                      </div>
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center mb-4">
-                      <Users className="h-5 w-5 text-gray-500 mr-2" />
-                      <span className="text-sm text-gray-600">{subject.students} students enrolled</span>
-                    </div>
-                    <Button
-                      className="w-full"
-                      onClick={() => setSelectedSubject(subject.id)}
-                    >
-                      View Subject
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </>
-      ) : (
-        <Card className="bg-gray-50 border border-dashed">
-          <CardContent className="flex flex-col items-center justify-center p-6">
-            <Book size={48} className="text-gray-400 mb-2" />
-            <p className="text-gray-500 text-center mb-4">
-              Please select an Academic Year and Semester to view subject cards.
-            </p>
-          </CardContent>
-        </Card>
-      )}
-    </div>
-  );
-};
-
-export default SubjectBuilder;
+  const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false);
+  const [newTask, setNewTask] = useState<Omit<Task, 'id'>>({ title: '', description: '', status: 'open' });
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [editedTask, setEditedTask] = useState<Task | null>(null);
+  const [isStudentDialogOpen, setIsStudentDialogOpen] = useState(false);
+  const [newStudent, setNewStudent] = useState<Omit<Student, 'id'>>({ name: '', usn: '', email: '', phone: '' });
+  const [isStudentEditDialogOpen, setIsStudentEditDialogOpen] = useState(false);
+  const [editedStudent, setEditedStudent] = useState<Student | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [studentSearchQuery, setStudentSearchQuery] = useState('');
+  const [isDeleteTaskDialogOpen, setIsDeleteTaskDialogOpen] = useState(false);
+  const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
+  const [isDeleteStudentDialogOpen, setIsDeleteStudentDialogOpen] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState<string | null>(null);
+  const [isBatchDialogOpen, setIsBatchDialogOpen] = useState(false);
+  const [newBatch, setNewBatch] = useState({ name: '', description: '' });
+  const [batches, setBatches] = useState([
+    { id: '1', name: 'Batch 1', description: 'Description for Batch 1' },
+    { id: '2', name: 'Batch 2', description: 'Description for Batch 2' },
+  ]);
+  const [isEditBatchDialogOpen, setIsEditBatchDialogOpen] = useState(false);
+  const [editedBatch, setEditedBatch] = useState<any | null>(null);
+  const [isDeleteBatchDialogOpen, setIsDeleteBatchDialogOpen] = useState(false);
+  const [batchToDelete, setBatchToDelete] = useState<string | null>(null);
+  const [isSubjectDialogOpen, setIsSubjectDialogOpen] = useState(false);
+  const [newSubject, setNewSubject] = useState({ name: '', code: '', description: '' });
+  const [subjects, setSubjects] = useState([
+    { id: '1', name: 'Subject 1', code: 'SUB001', description: 'Description for Subject 1' },
+    { id: '2', name: 'Subject 2', code: 'SUB002', description: 'Description for Subject 2' },
+  ]);
+  const [isEditSubjectDialogOpen, setIsEditSubjectDialogOpen] = useState(false);
+  const [editedSubject, setEditedSubject] = useState<any | null>(null);
+  const [isDeleteSubjectDialogOpen, setIsDeleteSubjectDialogOpen] = useState(false);
+  const [subjectToDelete, setSubjectToDelete] = useState<string | null>(null);
+  const [isAssignmentDialogOpen, setIsAssignmentDialogOpen] = useState(false);
+  const [newAssignment, setNewAssignment] = useState({ title: '', description: '', dueDate: new Date() });
+  const [assignments, setAssignments] = useState([
+    { id: '1', title: 'Assignment 1', description: 'Description for Assignment 1', dueDate: new Date() },
+    { id: '2', title: 'Assignment 2', description: 'Description for Assignment 2', dueDate: new Date() },
+  ]);
+  const [isEditAssignmentDialogOpen, setIsEditAssignmentDialogOpen] = useState(false);
+  const [editedAssignment, setEditedAssignment] = useState<any | null>(null);
+  const [isDeleteAssignmentDialogOpen, setIsDeleteAssignmentDialogOpen] = useState(false);
+  const [assignmentToDelete, setAssignmentToDelete] = useState<string | null>(null);
+  const [isAttendanceDialogOpen, setIsAttendanceDialogOpen] = useState(false);
+  const [attendanceDate, setAttendanceDate] = useState<Date | null>(new Date());
+  const [attendanceRecords, setAttendanceRecords] = useState<{ [studentId: string]: boolean }>({});
+  const [isEditAttendanceDialogOpen, setIsEditAttendanceDialogOpen] = useState(false);
+  const [editedAttendanceDate, setEditedAttendanceDate] = useState<Date | null>(new Date());
+  const [editedAttendanceRecords, setEditedAttendanceRecords] = useState<{ [studentId: string]: boolean }>({});
+  const [isCieDialogOpen, setIsCieDialogOpen] = useState(false);
+  const [newCie, setNewCie] = useState({ title: '', description: '', totalMarks: 100 });
+  const [cies, setCies] = useState([
+    { id: '1', title: 'CIE 1', description: 'Description for CIE 1', totalMarks: 100 },
+    { id: '2', title: 'CIE 2', description: 'Description for CIE 2', totalMarks: 100 },
+  ]);
+  const [isEditCieDialogOpen, setIsEditCieDialogOpen] = useState(false);
+  const [editedCie, setEditedCie] = useState<any | null>(null);
+  const [isDeleteCieDialogOpen, setIsDeleteCieDialogOpen] = useState(false);
+  const [cieToDelete, setCieToDelete] = useState<string | null>(null);
+  const [isCieEvaluationDialogOpen, setIsCieEvaluationDialogOpen] = useState(false);
+  const [selectedCie, setSelectedCie] = useState<any | null>(null);
+  const [cieEvaluations, setCieEvaluations] = useState<{ [studentId: string]: number }>({});
+  const [isEditCieEvaluationDialogOpen, setIsEditCieEvaluationDialogOpen] = useState(false);
+  const [editedCieEvaluations, setEditedCieEvaluations] = useState<{ [studentId: string]: number }>({});
+  const [isLabAttendanceDialogOpen, setIsLabAttendanceDialogOpen] = useState(false);
+  const [labAttendanceDate, setLabAttendanceDate] = useState<Date | null>(new Date());
+  const [labAttendanceRecords, setLabAttendanceRecords] = useState<{ [studentId: string]: boolean }>({});
+  const [isEditLabAttendanceDialogOpen, setIsEditLabAttendanceDialogOpen] = useState(false);
+  const [editedLabAttendanceDate, setEditedLabAttendanceDate] = useState<Date | null>(new Date());
+  const [editedLabAttendanceRecords, setEditedLabAttendanceRecords] = useState<{ [studentId: string]: boolean }>({});
+  const [isTimeTableDialogOpen, setIsTimeTableDialogOpen] = useState(false);
+  const [timeTable, setTimeTable] = useState([
+    { id: '1', day: 'Monday', time: '9:00 AM', subject: 'Subject 1' },
+    { id: '2', day: 'Tuesday', time: '10:00 AM', subject: 'Subject 2' },
+  ]);
+  const [isEditTimeTableDialogOpen, setIsEditTimeTableDialogOpen] = useState(false);
+  const [editedTimeTable, setEditedTimeTable] = useState<any | null>(null);
+  const [isDeleteTimeTableDialogOpen, setIsDeleteTimeTableDialogOpen] = useState(false);
+  const [timeTableToDelete, setTimeTableToDelete] = useState<string | null>(null);
+  const [newTimeTable, setNewTimeTable] = useState({ day: '', time: '', subject: '' });
+  const [isSyllabusDialogOpen, setIsSyllabusDialogOpen] = useState(false);
+  const [syllabus, setSyllabus] = useState([
+    { id: '1', topic: 'Topic 1', description: 'Description for Topic 1' },
+    { id: '2', topic: 'Topic 2', description: 'Description for Topic 2' },
+  ]);
+  const [isEditSyllabusDialogOpen, setIsEditSyllabusDialogOpen] = useState(false);
+  const [editedSyllabus, setEditedSyllabus] = useState<any | null>(null);
+  const [isDeleteSyllabusDialogOpen, setIsDeleteSyllabusDialogOpen] = useState(false);
+  const [syllabusToDelete, setSyllabusToDelete] = useState<string | null>(null);
+  const [newSyllabus, setNewSyllabus] = useState({ topic: '', description: '' });
+  const [isResourcesDialogOpen, setIsResourcesDialogOpen] = useState(false);
+  const [resources, setResources] = useState([
+    { id: '1', name: 'Resource 1', link: 'http://example.com/resource1' },
+    { id: '2', name: 'Resource 2', link: 'http://example.com/resource2' },
+  ]);
+  const [isEditResourcesDialogOpen, setIsEditResourcesDialogOpen] = useState(false);
+  const [editedResources, setEditedResources] = useState<any | null>(null);
+  const [isDeleteResourcesDialogOpen, setIsDeleteResourcesDialogOpen] = useState(false);
+  const [resourcesToDelete, setResourcesToDelete] = useState<string | null>(null);
+  const [newResources, setNewResources] = useState({ name: '', link: '' });
+  const [isNotificationsDialogOpen, setIsNotificationsDialogOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: '1', message: 'Notification 1', date: new Date() },
+    { id: '2', message: 'Notification 2', date: new Date() },
+  ]);
+  const [isEditNotificationsDialogOpen, setIsEditNotificationsDialogOpen] = useState(false);
+  const [editedNotifications, setEditedNotifications] = useState<any | null>(null);
+  const [isDeleteNotificationsDialogOpen, setIsDeleteNotificationsDialogOpen] = useState(false);
+  const [notificationsToDelete, setNotificationsToDelete] = useState<string | null>(null);
+  const [newNotifications, setNewNotifications] = useState({ message: '', date: new Date() });
+  const [isSettingsDialogOpen, setIsSettingsDialogOpen] = useState(false);
+  const [settings, setSettings] = useState({ theme: 'light', notificationsEnabled: true });
+  const [isEditSettingsDialogOpen, setIsEditSettingsDialogOpen] = useState(false);
+  const [editedSettings, setEditedSettings] = useState<any | null>(null);
+  const [isProfileDialogOpen, setIsProfileDialogOpen] = useState(false);
+  const [profile, setProfile] = useState({ name: 'John Doe', email: 'john.doe@example.com', role: 'Teacher' });
+  const [isEditProfileDialogOpen, setIsEditProfileDialogOpen] = useState(false);
+  const [editedProfile, setEditedProfile] = useState<any | null>(null);
+  const [isGradesDialogOpen, setIsGradesDialogOpen] = useState(false);
+  const [grades, setGrades] = useState([
+    { id: '1', student: 'John Doe', subject: 'Subject 1', grade: 'A' },
+    { id: '2', student: 'Jane Smith', subject: 'Subject 2', grade: 'B' },
+  ]);
+  const [isEditGradesDialogOpen, setIsEditGradesDialogOpen] = useState(false);
+  const [editedGrades, setEditedGrades] = useState<any | null>(null);
+  const [isAnalyticsDialogOpen, setIsAnalyticsDialogOpen] = useState(false);
+  const [analytics, setAnalytics] = useState({ attendanceRate: 90, averageGrade: 'B' });
+  const [isEditAnalyticsDialogOpen, setIsEditAnalyticsDialogOpen] = useState(false);
+  const [editedAnalytics, setEditedAnalytics] = useState<any | null>(null);
+  const [isSupportDialogOpen, setIsSupportDialogOpen] = useState(false);
+  const [supportTickets, setSupportTickets] = useState([
+    { id: '1', subject: 'Support Ticket 1', status: 'Open' },
+    { id: '2', subject: 'Support Ticket 2', status: 'Closed' },
+  ]);
+  const [isEditSupportDialogOpen, setIsEditSupportDialogOpen] = useState(false);
+  const [editedSupport, setEditedSupport] = useState<any | null>(null);
+  const [isFeedbackDialogOpen, setIsFeedbackDialogOpen] = useState(false);
+  const [feedback, setFeedback] = useState([
+    { id: '1', message: 'Feedback 1', date: new Date() },
+    { id: '2', message: 'Feedback 2', date: new Date() },
+  ]);
+  const [isEditFeedbackDialogOpen, setIsEditFeedbackDialogOpen] = useState(false);
+  const [editedFeedback, setEditedFeedback] = useState<any | null>(null);
+  const [isResourcesCategoriesDialogOpen, setIsResourcesCategoriesDialogOpen] = useState(false);
+  const [resourcesCategories, setResourcesCategories] = useState([
+    { id: '1', name: 'Category 1', description: 'Description for Category 1' },
+    { id: '2', name: 'Category 2', description: 'Description for Category 2' },
+  ]);
+  const [isEditResourcesCategoriesDialogOpen, setIsEditResourcesCategoriesDialogOpen] = useState(false);
+  const [editedResourcesCategories, setEditedResourcesCategories] = useState<any | null>(null);
+  const [isEventsDialogOpen, setIsEventsDialogOpen] = useState(false);
+  const [events, setEvents] = useState([
+    { id: '1', title: 'Event 1', date: new Date() },
+    { id: '2', title: 'Event 2', date: new Date() },
+  ]);
+  const [isEditEventsDialogOpen, setIsEditEventsDialogOpen] = useState(false);
+  const [editedEvents, setEditedEvents] = useState<any | null>(null);
+  const [isForumsDialogOpen, setIsForumsDialogOpen] = useState(false);
+  const [forums, setForums] = useState([
+    { id: '1', title: 'Forum 1', description: 'Description for Forum 1' },
+    { id: '2', title: 'Forum 2', description: 'Description for Forum 2' },
+  ]);
+  const [isEditForumsDialogOpen, setIsEditForumsDialogOpen] = useState(false);
+  const [editedForums, setEditedForums] = useState<any | null>(null);
+  const [isChatDialogOpen, setIsChatDialogOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState([
+    { id: '1', message: 'Message 1', sender: 'John Doe', date: new Date() },
+    { id: '2', message: 'Message 2', sender: 'Jane Smith', date: new Date() },
+  ]);
+  const [isEditChatDialogOpen, setIsEditChatDialogOpen] = useState(false);
+  const [editedChat, setEditedChat] = useState<any | null>(null);
+  const [isFilesDialogOpen, setIsFilesDialogOpen] = useState(false);
+  const [files, setFiles] = useState([
+    { id: '1', name: 'File 1', size: '1MB', date: new Date() },
+    { id: '2', name: 'File 2', size: '2MB', date: new Date() },
+  ]);
+  const [isEditFilesDialogOpen, setIsEditFilesDialogOpen] = useState(false);
+  const [editedFiles, setEditedFiles] = useState<any | null>(null);
+  const [isLinksDialogOpen, setIsLinksDialogOpen] = useState(false);
+  const [links, setLinks] = useState([
+    { id: '1', name: 'Link 1', url: 'http://example.com/link1' },
+    { id: '2', name: 'Link 2', url: 'http://example.com/link2' },
+  ]);
+  const [isEditLinksDialogOpen, setIsEditLinksDialogOpen] = useState(false);
+  const [editedLinks, setEditedLinks] = useState<any | null>(null);
+  const [isCalendarDialogOpen, setIsCalendarDialogOpen] = useState(false);
+  const [calendarEvents, setCalendarEvents] = useState([
+    { id: '1', title: 'Event 1', date: new Date() },
+    { id: '2', title: 'Event 2', date: new Date() },
+  ]);
+  const [isEditCalendarDialogOpen, setIsEditCalendarDialogOpen] = useState(false);
+  const [editedCalendar, setEditedCalendar] = useState<any | null>(null);
+  const [isAnnouncementsDialogOpen, setIsAnnouncementsDialogOpen] = useState(false);
+  const [announcements, setAnnouncements] = useState([
+    { id: '1', title: 'Announcement 1', date: new Date() },
+    { id: '2', title: 'Announcement 2', date: new Date() },
+  ]);
+  const [isEditAnnouncementsDialogOpen, setIsEditAnnouncementsDialogOpen] = useState(false);
+  const [editedAnnouncements, setEditedAnnouncements] = useState<any | null>(null);
+  const [isPollsDialogOpen, setIsPollsDialogOpen] = useState(false);
+  const [polls, setPolls] = useState([
+    { id: '1', question: 'Poll 1', options: ['Option 1', 'Option 2'] },
+    { id: '2', question: 'Poll 2', options: ['Option 3', 'Option 4'] },
+  ]);
+  const [isEditPollsDialogOpen, setIsEditPollsDialogOpen] = useState(false);
+  const [editedPolls, setEditedPolls] = useState<any | null>(null);
+  const [isQuizzesDialogOpen, setIsQuizzesDialogOpen] = useState(false);
+  const [quizzes, setQuizzes] = useState([
+    { id: '1', title: 'Quiz 1', questions: ['Question 1', 'Question 2'] },
+    { id: '2', title: 'Quiz 2', questions: ['Question 3', 'Question 4'] },
+  ]);
+  const [isEditQuizzesDialogOpen, setIsEditQuizzesDialogOpen] = useState(false);
+  const [editedQuizzes, setEditedQuizzes] = useState<any | null>(null);
+  const [isAssignmentsSubmissionsDialogOpen, setIsAssignmentsSubmissionsDialogOpen] = useState(false);
+  const [assignmentsSubmissions, setAssignmentsSubmissions] = useState([
+    { id: '1', student: 'John Doe', assignment: 'Assignment 1', submissionDate: new Date() },
+    { id: '2', student: 'Jane Smith', assignment: 'Assignment 2', submissionDate: new Date() },
+  ]);
+  const [isEditAssignmentsSubmissionsDialogOpen, setIsEditAssignmentsSubmissionsDialogOpen] = useState(false);
+  const [editedAssignmentsSubmissions, setEditedAssignmentsSubmissions] = useState<any | null>(null);
+  const [isAttendanceReportsDialogOpen, setIsAttendanceReportsDialogOpen] = useState(false);
+  const [attendanceReports, setAttendanceReports] = useState([
+    { id: '1', student: 'John Doe', attendanceRate: 90 },
+    { id: '2', student: 'Jane Smith', attendanceRate: 80 },
+  ]);
+  const [isEditAttendanceReportsDialogOpen, setIsEditAttendanceReportsDialogOpen] = useState(false);
+  const [editedAttendanceReports, setEditedAttendanceReports] = useState<any | null>(null);
+  const [isCieReportsDialogOpen, setIsCieReportsDialogOpen] = useState(false);
+  const [cieReports, setCieReports] = useState([
+    { id: '1', student: 'John Doe', cieScore: 80 },
+    { id: '2', student: 'Jane Smith', cieScore: 90 },
+  ]);
+  const [isEditCieReportsDialogOpen, setIsEditCieReportsDialogOpen] = useState(false);
+  const [editedCieReports, setEditedCieReports] = useState<any | null>(null);
+  const [isCoPoMappingDialogOpen, setIsCoPoMappingDialogOpen] = useState(false);
+  const [coPoMapping, setCoPoMapping] = useState([
+    { id: '1', co: 'CO1', po: 'PO1', mapping: 3 },
+    { id: '2', co: 'CO2', po: 'PO2', mapping: 2 },
+  ]);
+  const [isEditCoPoMappingDialogOpen, setIsEditCoPoMappingDialogOpen] = useState(false);
+  const [editedCoPoMapping, setEditedCoPoMapping] = useState<any | null>(null);
+  const [isCourseOutcomesDialogOpen, setIsCourseOutcomesDialogOpen] = useState(false);
+  const [courseOutcomes, setCourseOutcomes] = useState([
+    { id: '1', description: 'Course Outcome 1' },
+    { id: '2', description: 'Course Outcome 2' },
+  ]);
+  const [isEditCourseOutcomesDialogOpen, setIsEditCourseOutcomesDialogOpen] = useState(false);
+  const [editedCourseOutcomes, setEditedCourseOutcomes] = useState<any | null>(null);
+  const [isProgramOutcomesDialogOpen, setIsProgramOutcomesDialogOpen] = useState(false);
+  const [programOutcomes, setProgramOutcomes] = useState([
+    { id: '1', description: 'Program Outcome 1' },
+    { id: '2', description: 'Program Outcome 2' },
+  ]);
+  const [isEditProgramOutcomesDialogOpen, setIsEditProgramOutcomesDialogOpen] = useState(false);
+  const [editedProgramOutcomes, setEditedProgramOutcomes] = useState<any | null>(null);
+  const [isAssessmentsDialogOpen, setIsAssessmentsDialogOpen] = useState(false);
+  const [assessments, setAssessments] = useState([
+    { id: '1', title: 'Assessment 1', totalMarks: 100 },
+    { id: '2', title: 'Assessment 2', totalMarks: 100 },
+  ]);
+  const [isEditAssessmentsDialogOpen, setIsEditAssessmentsDialogOpen] = useState(false);
+  const [editedAssessments, setEditedAssessments] = useState<any | null>(null);
+  const [isRubricsDialogOpen, setIsRubricsDialogOpen] = useState(false);
+  const [rubrics, setRubrics] = useState([
+    { id: '1', title: 'Rubric 1', description: 'Description for Rubric 1' },
+    { id: '2', title: 'Rubric 2', description: 'Description for Rubric 2' },
+  ]);
+  const [isEditRubricsDialogOpen, setIsEditRubricsDialogOpen] = useState(false);
+  const [editedRubrics, setEditedRubrics] = useState<any | null>(null);
+  const [isBloomTaxonomyDialogOpen, setIsBloomTaxonomyDialogOpen] = useState(false);
+  const [bloomTaxonomy, setBloomTaxonomy] = useState([
+    { id: '1', level: 'Level 1', description: 'Description for Level 1' },
+    { id: '2', level: 'Level 2', description: 'Description for Level 2' },
+  ]);
+  const [isEditBloomTaxonomyDialogOpen, setIsEditBloomTaxonomyDialogOpen] = useState(false);
+  const [editedBloomTaxonomy, setEditedBloomTaxonomy] = useState<any | null>(null);
+  const [isLearningObjectivesDialogOpen, setIsLearningObjectivesDialogOpen] = useState(false);
+  const [learningObjectives, setLearningObjectives] = useState([
+    { id: '1', description: 'Learning Objective 1' },
+    { id: '2', description: 'Learning Objective 2' },
+  ]);
+  const [isEditLearningObjectivesDialogOpen, setIsEditLearningObjectivesDialogOpen] = useState(false);
+  const [editedLearningObjectives, setEditedLearningObjectives] = useState<any | null>(null);
+  const [isTeachingMethodsDialogOpen, setIsTeachingMethodsDialogOpen] = useState(false);
+  const [teachingMethods, setTeachingMethods] = useState([
+    { id: '1', method: 'Method 1', description: 'Description for Method 1' },
+    { id: '2', method: 'Method 2', description: 'Description for Method 2' },
+  ]);
+  const [isEditTeachingMethodsDialogOpen, setIsEditTeachingMethodsDialogOpen] = useState(false);
+  const [editedTeachingMethods, setEditedTeachingMethods] = useState<any | null>(null);
+  const [isLearningActivitiesDialogOpen, setIsLearningActivitiesDialogOpen] = useState(false);
+  const [learningActivities, setLearningActivities] = useState([
+    { id: '1', activity: 'Activity 1', description: 'Description for Activity 1' },
+    { id: '2', activity: 'Activity 2', description: 'Description for Activity 2' },
+  ]);
+  const [isEditLearningActivitiesDialogOpen, setIsEditLearningActivitiesDialogOpen] = useState(false);
+  const [editedLearningActivities, setEditedLearningActivities] = useState<any | null>(null);
+  const [isLearningResourcesDialogOpen, setIsLearningResourcesDialogOpen] = useState(false);
+  const [learningResources, setLearningResources] = useState([
+    { id: '1', resource: 'Resource 1', description: 'Description for Resource 1' },
+    { id: '2', resource: 'Resource 2', description: 'Description for Resource 2' },
+  ]);
+  const [isEditLearningResourcesDialogOpen, setIsEditLearningResourcesDialogOpen] = useState(false);
+  const [editedLearningResources, setEditedLearningResources] = useState<any | null>(null);
+  const [isAssessmentMethodsDialogOpen, setIsAssessmentMethodsDialogOpen] = useState(false);
+  const [assessmentMethods, setAssessmentMethods] = useState([
+    { id: '1', method: 'Method 1', description: 'Description for Method 1' },
+    { id: '2', method: 'Method 2', description: 'Description for Method 2' },
+  ]);
+  const [isEditAssessmentMethodsDialogOpen, setIsEditAssessmentMethodsDialogOpen] = useState(false);
+  const [editedAssessmentMethods, setEditedAssessmentMethods] = useState<any | null>(null);
+  const [isFeedbackMethodsDialogOpen, setIsFeedbackMethodsDialogOpen] = useState(false);
+  const [feedbackMethods, setFeedbackMethods] = useState([
+    { id: '1', method: 'Method 1', description: 'Description for Method 1' },
+    { id: '2', method: 'Method 2', description: 'Description for Method 2' },
+  ]);
+  const [isEditFeedbackMethodsDialogOpen, setIsEditFeedbackMethodsDialogOpen] = useState(false);
+  const [editedFeedbackMethods, setEditedFeedbackMethods] = useState<any | null>(null);
+  const [isGradingCriteriaDialogOpen, setIsGradingCriteriaDialogOpen] = useState(false);
+  const [gradingCriteria, setGradingCriteria] = useState([
+    { id: '1', criteria: 'Criteria 1', description: 'Description for Criteria 1' },
+    { id: '2', criteria: 'Criteria 2', description: 'Description for Criteria 2' },
+  ]);
+  const [isEditGradingCriteriaDialogOpen, setIsEditGradingCriteriaDialogOpen] = useState(false);
+  const [editedGradingCriteria, setEditedGradingCriteria] = useState<any | null>(null);
+  const [isCoursePoliciesDialogOpen, setIsCoursePoliciesDialogOpen] = useState(false);
+  const [coursePolicies, setCoursePolicies] = useState([
+    { id: '1', policy: 'Policy 1', description: 'Description for Policy 1' },
+    { id: '2', policy: 'Policy 2', description: 'Description for Policy 2' },
+  ]);
+  const [isEditCoursePoliciesDialogOpen, setIsEditCoursePoliciesDialogOpen] = useState(false);
+  const [editedCoursePolicies, setEditedCoursePolicies] = useState<any | null>(null);
+  const [isAcademicIntegrityDialogOpen, setIsAcademicIntegrityDialogOpen] = useState(false);
+  const [academicIntegrity, setAcademicIntegrity] = useState([
+    { id: '1', policy: 'Policy 1', description: 'Description for Policy 1' },
+    { id: '2', policy: 'Policy 2', description: 'Description for Policy 2' },
+  ]);
+  const [isEditAcademicIntegrityDialogOpen, setIsEditAcademicIntegrityDialogOpen] = useState(false);
+  const [editedAcademicIntegrity, setEditedAcademicIntegrity] = useState<any | null>(null);
+  const [isDisabilityServicesDialogOpen, setIsDisabilityServicesDialogOpen] = useState(false);
+  const [disabilityServices, setDisabilityServices] = useState([
+    { id: '1', service: 'Service 1', description: 'Description for Service 1' },
+    { id: '2', service: 'Service 2', description: 'Description for Service 2' },
+  ]);
+  const [isEditDisabilityServicesDialogOpen, setIsEditDisabilityServicesDialogOpen] = useState(false);
+  const [editedDisabilityServices, setEditedDisabilityServices] = useState<any | null>(null);
+  const [isReligiousAccommodationsDialogOpen, setIsReligiousAccommodationsDialogOpen] = useState(false);
+  const [religiousAccommodations, setReligiousAccommodations] = useState([
+    { id: '1', accommodation: 'Accommodation 1', description: 'Description for Accommodation 1' },
