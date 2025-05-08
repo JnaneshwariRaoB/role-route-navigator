@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/select";
 import { useRole } from "@/hooks/useRole";
 import { toast } from "sonner";
+import { UserCircle } from "lucide-react";
 
 type Role = "coordinator" | "associator" | "hod";
 
@@ -54,7 +55,7 @@ const TopBar = () => {
         </div>
         <div className="flex items-center gap-2">
           <div className="h-8 w-8 bg-indigo-600 rounded-full flex items-center justify-center text-white hover:bg-indigo-700 transition-colors cursor-pointer">
-            U
+            <UserCircle size={18} />
           </div>
           <span className="text-sm font-medium text-gray-700">User</span>
         </div>

@@ -62,7 +62,6 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
-import { ModeToggle } from "@/components/ModeToggle"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useToast } from "@/components/ui/use-toast"
@@ -88,9 +87,6 @@ import { Circle } from 'lucide-react';
 import {
   HoverCard,
   HoverCardContent,
-  HoverCardDescription,
-  HoverCardHeader,
-  HoverCardTitle,
   HoverCardTrigger,
 } from "@/components/ui/hover-card"
 import { AspectRatio } from "@/components/ui/aspect-ratio"
@@ -128,7 +124,6 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
-import { CalendarDateRangePicker } from "@/components/ui/calendar-date-range-picker"
 import { Pagination } from "@/components/ui/pagination"
 import { usePagination } from "@/hooks/use-pagination"
 import { InputWithButton } from "@/components/ui/input-with-button"
@@ -527,7 +522,3 @@ const SubjectBuilder = () => {
       <h1>Subject Builder</h1>
       <div>Content goes here</div>
     </div>
-  );
-};
-
-export default SubjectBuilder;
