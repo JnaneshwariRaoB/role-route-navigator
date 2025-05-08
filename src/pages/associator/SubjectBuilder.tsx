@@ -126,16 +126,18 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable"
 import { Pagination } from "@/components/ui/pagination"
-import { usePagination } from "@/hooks/use-pagination"
-import { InputWithButton } from "@/components/ui/input-with-button"
-import { CommandMenu } from "@/components/ui/command-menu"
-import { DataTable } from "@/components/ui/data-table"
-import { DataTableViewOptions } from "@/components/ui/data-table-view-options"
-import { FileTree } from "@/components/ui/file-tree"
-import { Kbd } from "@/components/ui/kbd"
 import { Link } from "react-router-dom"
-import { Icons } from "@/components/icons"
 import { useRole } from "@/hooks/useRole";
+
+// Removing the imports that are causing errors:
+// import { usePagination } from "@/hooks/use-pagination"
+// import { InputWithButton } from "@/components/ui/input-with-button"
+// import { CommandMenu } from "@/components/ui/command-menu"
+// import { DataTable } from "@/components/ui/data-table"
+// import { DataTableViewOptions } from "@/components/ui/data-table-view-options"
+// import { FileTree } from "@/components/ui/file-tree"
+// import { Kbd } from "@/components/ui/kbd"
+// import { Icons } from "@/components/icons"
 
 interface Task {
   id: string;
