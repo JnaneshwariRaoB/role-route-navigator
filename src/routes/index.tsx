@@ -37,7 +37,7 @@ const routes: RouteObject[] = [
       // ✅ External Redirects
       {
         path: "hod", // when user clicks HOD section
-        element: <ExternalRedirect to="https://academic-role-navigator.lovable.app/coordinator/home" />,
+        element: <ExternalRedirect to="https://academic-role-navigator.lovable.app/hod/home" />,
       },
       {
         path: "associator", // when user clicks Course Associator
