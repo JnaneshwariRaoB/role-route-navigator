@@ -19,7 +19,7 @@ const TopBar = () => {
     if (value === "associator") {
       window.location.href = "https://subject-insight-tool.lovable.app/";
     } else if (value === "hod") {
-      window.location.href = "https://academic-role-navigator.lovable.app/";
+      window.location.href = "https://academic-role-navigator.lovable.app/hod/dashboard";
     }
     // "coordinator" stays on current app
   };
