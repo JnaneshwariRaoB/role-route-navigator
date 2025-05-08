@@ -8,16 +8,20 @@ import {
 } from "@/components/ui/select";
 import { useRole } from "@/hooks/useRole";
 
+type Role = "coordinator" | "associator" | "hod";
+
 const TopBar = () => {
   const { role, setRole } = useRole();
 
   const handleRoleChange = (value: string) => {
-    setRole(value);
+    setRole(value as Role);
 
     if (value === "associator") {
       window.location.href = "https://subject-insight-tool.lovable.app/";
+    } else if (value === "hod") {
+      window.location.href = "https://academic-role-navigator.lovable.app/";
     }
-    // "hod" and "coordinator" do not redirect
+    // "coordinator" stays on current app
   };
 
   return (
