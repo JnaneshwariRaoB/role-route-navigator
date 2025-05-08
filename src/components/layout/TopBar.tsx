@@ -14,15 +14,20 @@ const TopBar = () => {
   const { role, setRole } = useRole();
 
   const handleRoleChange = (value: string) => {
-    setRole(value as Role);
-
-    if (value === "associator") {
+  if (value === "associator") {
+    setTimeout(() => {
       window.location.href = "https://subject-insight-tool.lovable.app/";
-    } else if (value === "hod") {
+    }, 10);
+  } else if (value === "hod") {
+    setTimeout(() => {
       window.location.href = "https://academic-role-navigator.lovable.app/hod/dashboard";
-    }
-    // "coordinator" stays on current app
-  };
+    }, 10);
+  } else {
+    // Internal route, set the state
+    setRole(value as Role);
+  }
+};
+
 
   return (
     <div className="w-full bg-white border-b border-gray-200 py-3 px-5 flex justify-between items-center shadow-sm">
