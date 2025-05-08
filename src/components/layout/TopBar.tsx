@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Select,
@@ -9,8 +8,26 @@ import {
 } from "@/components/ui/select";
 import { useRole } from "@/hooks/useRole";
 
+type Role = "coordinator" | "associator" | "hod";
+
 const TopBar = () => {
   const { role, setRole } = useRole();
+
+  const handleRoleChange = (value: string) => {
+    setRole(value as Role);
+  
+    if (value === "associator") {
+      setTimeout(() => {
+        window.location.href = "https://subject-insight-tool.lovable.app/";
+      }, 100);
+    } else if (value === "hod") {
+      setTimeout(() => {
+        window.location.href = "https://academic-role-navigator.lovable.app/hod/dashboard";
+      }, 100);
+    }
+    // coordinator remains in app
+  };
+  
 
   return (
     <div className="w-full bg-white border-b border-gray-200 py-3 px-5 flex justify-between items-center shadow-sm">
@@ -21,15 +38,16 @@ const TopBar = () => {
         <div className="mr-4">
           <Select 
             value={role}
-            onValueChange={setRole}
+            onValueChange={handleRoleChange}
           >
             <SelectTrigger className="w-[200px] bg-white">
               <SelectValue placeholder="Select Role" />
             </SelectTrigger>
             <SelectContent>
+            <SelectItem value="hod">HOD</SelectItem>
               <SelectItem value="coordinator">Course Coordinator</SelectItem>
               <SelectItem value="associator">Course Associator</SelectItem>
-              <SelectItem value="hod">HOD</SelectItem>
+              
             </SelectContent>
           </Select>
         </div>
