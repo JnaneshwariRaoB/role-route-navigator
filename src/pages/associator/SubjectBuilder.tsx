@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import {
   Card,
@@ -522,3 +523,7 @@ const SubjectBuilder = () => {
       <h1>Subject Builder</h1>
       <div>Content goes here</div>
     </div>
+  );
+};
+
+export default SubjectBuilder;
