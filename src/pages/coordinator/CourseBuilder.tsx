@@ -34,6 +34,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
 
 const CourseBuilder = () => {
   const [selectedCourse, setSelectedCourse] = useState(null);
@@ -214,6 +217,98 @@ const CourseBuilder = () => {
     );
     setCieMarks(updatedMarks);
     toast.success(`Mark updated for student ${studentId}`);
+  };
+
+  // New state for course plan
+  const [coursePlan, setCoursePlan] = useState([
+    { 
+      id: 1,
+      week: 1,
+      topic: "Introduction to Computing",
+      subTopics: ["Computing basics", "History of computing", "Introduction to programming"],
+      teachingMethod: "Lecture, Discussion",
+      coReference: ["CO1"],
+      resources: ["Textbook Ch.1", "Slide deck 1"],
+      isEditing: false
+    },
+    { 
+      id: 2,
+      week: 2,
+      topic: "Programming Fundamentals",
+      subTopics: ["Variables", "Data types", "Control structures"],
+      teachingMethod: "Lecture, Lab",
+      coReference: ["CO1", "CO2"],
+      resources: ["Textbook Ch.2", "Online tutorial"],
+      isEditing: false
+    },
+    { 
+      id: 3,
+      week: 3,
+      topic: "Data Structures",
+      subTopics: ["Arrays", "Lists", "Stacks and Queues"],
+      teachingMethod: "Lecture, Lab",
+      coReference: ["CO2"],
+      resources: ["Textbook Ch.3", "Practice problems"],
+      isEditing: false
+    }
+  ]);
+
+  const [newPlanItem, setNewPlanItem] = useState({
+    week: "",
+    topic: "",
+    subTopics: "",
+    teachingMethod: "",
+    coReference: "",
+    resources: ""
+  });
+
+  const [isAddingPlanItem, setIsAddingPlanItem] = useState(false);
+
+  // Handle editing course plan item
+  const togglePlanItemEdit = (id) => {
+    setCoursePlan(coursePlan.map(item => 
+      item.id === id ? { ...item, isEditing: !item.isEditing } : item
+    ));
+  };
+
+  // Handle updating plan item fields
+  const updatePlanItem = (id, field, value) => {
+    setCoursePlan(coursePlan.map(item => 
+      item.id === id ? { ...item, [field]: value } : item
+    ));
+  };
+
+  // Handle adding new plan item
+  const handleAddPlanItem = () => {
+    const newItem = {
+      id: coursePlan.length + 1,
+      week: parseInt(newPlanItem.week) || coursePlan.length + 1,
+      topic: newPlanItem.topic,
+      subTopics: newPlanItem.subTopics.split(',').map(item => item.trim()),
+      teachingMethod: newPlanItem.teachingMethod,
+      coReference: newPlanItem.coReference.split(',').map(item => item.trim()),
+      resources: newPlanItem.resources.split(',').map(item => item.trim()),
+      isEditing: false
+    };
+    
+    setCoursePlan([...coursePlan, newItem]);
+    setIsAddingPlanItem(false);
+    setNewPlanItem({
+      week: "",
+      topic: "",
+      subTopics: "",
+      teachingMethod: "",
+      coReference: "",
+      resources: ""
+    });
+    
+    toast.success("Course plan item added successfully!");
+  };
+
+  // Delete plan item
+  const deletePlanItem = (id) => {
+    setCoursePlan(coursePlan.filter(item => item.id !== id));
+    toast.success("Course plan item deleted successfully!");
   };
 
   return (
@@ -618,8 +713,248 @@ const CourseBuilder = () => {
               </TabsContent>
 
               <TabsContent value="plan">
-                <h3 className="text-lg font-medium mb-4">Course Plan</h3>
-                <p className="text-gray-500">Course plan content will be displayed here.</p>
+                <div className="space-y-4">
+                  <div className="flex justify-between mb-4">
+                    <h3 className="text-lg font-medium">Course Weekly Plan</h3>
+                    <Button 
+                      variant="outline" 
+                      onClick={() => setIsAddingPlanItem(true)}
+                      className="hover:bg-green-50 active:bg-green-100 transition-colors"
+                    >
+                      <Plus size={16} className="mr-1" /> Add Week
+                    </Button>
+                  </div>
+
+                  <ScrollArea className="h-[500px]">
+                    <div className="space-y-4">
+                      {coursePlan.map((planItem) => (
+                        <Card key={planItem.id} className="border rounded-md overflow-hidden">
+                          <div className="bg-gradient-to-r from-gray-100 to-gray-50 p-3 flex justify-between items-center">
+                            <div className="flex items-center gap-3">
+                              <Badge variant="outline" className="bg-white">Week {planItem.week}</Badge>
+                              <h4 className="font-medium">{planItem.topic}</h4>
+                            </div>
+                            <div className="flex gap-2">
+                              <Button 
+                                size="sm" 
+                                variant="ghost" 
+                                onClick={() => togglePlanItemEdit(planItem.id)}
+                              >
+                                {planItem.isEditing ? <Save size={16} /> : <Edit size={16} />}
+                              </Button>
+                              {!planItem.isEditing && (
+                                <Button 
+                                  size="sm" 
+                                  variant="ghost" 
+                                  className="text-red-500 hover:text-red-700"
+                                  onClick={() => deletePlanItem(planItem.id)}
+                                >
+                                  <X size={16} />
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                          
+                          <div className="p-4">
+                            {planItem.isEditing ? (
+                              <div className="space-y-3">
+                                <div>
+                                  <label className="text-sm font-medium">Week</label>
+                                  <Input 
+                                    type="number" 
+                                    value={planItem.week}
+                                    onChange={(e) => updatePlanItem(planItem.id, 'week', parseInt(e.target.value))}
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Topic</label>
+                                  <Input 
+                                    value={planItem.topic}
+                                    onChange={(e) => updatePlanItem(planItem.id, 'topic', e.target.value)}
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Sub Topics</label>
+                                  <Textarea 
+                                    value={planItem.subTopics.join(', ')}
+                                    onChange={(e) => updatePlanItem(
+                                      planItem.id, 
+                                      'subTopics', 
+                                      e.target.value.split(',').map(item => item.trim())
+                                    )}
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Teaching Method</label>
+                                  <Input 
+                                    value={planItem.teachingMethod}
+                                    onChange={(e) => updatePlanItem(planItem.id, 'teachingMethod', e.target.value)}
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">CO Reference</label>
+                                  <Input 
+                                    value={planItem.coReference.join(', ')}
+                                    onChange={(e) => updatePlanItem(
+                                      planItem.id, 
+                                      'coReference', 
+                                      e.target.value.split(',').map(item => item.trim())
+                                    )}
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="text-sm font-medium">Resources</label>
+                                  <Textarea 
+                                    value={planItem.resources.join(', ')}
+                                    onChange={(e) => updatePlanItem(
+                                      planItem.id, 
+                                      'resources', 
+                                      e.target.value.split(',').map(item => item.trim())
+                                    )}
+                                    className="mt-1"
+                                  />
+                                </div>
+                                <div className="flex justify-end gap-2 pt-2">
+                                  <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    onClick={() => togglePlanItemEdit(planItem.id)}
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button 
+                                    size="sm"
+                                    onClick={() => {
+                                      togglePlanItemEdit(planItem.id);
+                                      toast.success("Changes saved successfully!");
+                                    }}
+                                  >
+                                    Save Changes
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="space-y-3">
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div>
+                                    <h5 className="text-sm font-medium text-gray-500">Sub Topics</h5>
+                                    <ul className="list-disc list-inside text-sm mt-1">
+                                      {planItem.subTopics.map((subtopic, index) => (
+                                        <li key={index}>{subtopic}</li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                  <div>
+                                    <h5 className="text-sm font-medium text-gray-500">Teaching Method</h5>
+                                    <p className="text-sm mt-1">{planItem.teachingMethod}</p>
+                                  </div>
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                  <div>
+                                    <h5 className="text-sm font-medium text-gray-500">CO Reference</h5>
+                                    <div className="flex gap-1 mt-1">
+                                      {planItem.coReference.map((co, index) => (
+                                        <Badge key={index} variant="secondary">{co}</Badge>
+                                      ))}
+                                    </div>
+                                  </div>
+                                  <div>
+                                    <h5 className="text-sm font-medium text-gray-500">Resources</h5>
+                                    <ul className="list-disc list-inside text-sm mt-1">
+                                      {planItem.resources.map((resource, index) => (
+                                        <li key={index}>{resource}</li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </ScrollArea>
+
+                  {/* Add plan item dialog */}
+                  <Dialog open={isAddingPlanItem} onOpenChange={setIsAddingPlanItem}>
+                    <DialogContent className="sm:max-w-[550px]">
+                      <DialogHeader>
+                        <DialogTitle>Add New Course Plan Item</DialogTitle>
+                      </DialogHeader>
+                      <div className="grid gap-4 py-4">
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <label className="text-right text-sm font-medium">Week</label>
+                          <Input
+                            type="number"
+                            value={newPlanItem.week}
+                            onChange={(e) => setNewPlanItem({...newPlanItem, week: e.target.value})}
+                            placeholder="Week number"
+                            className="col-span-3"
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <label className="text-right text-sm font-medium">Topic</label>
+                          <Input
+                            value={newPlanItem.topic}
+                            onChange={(e) => setNewPlanItem({...newPlanItem, topic: e.target.value})}
+                            placeholder="Main topic"
+                            className="col-span-3"
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <label className="text-right text-sm font-medium">Sub Topics</label>
+                          <Textarea
+                            value={newPlanItem.subTopics}
+                            onChange={(e) => setNewPlanItem({...newPlanItem, subTopics: e.target.value})}
+                            placeholder="Sub-topics, comma separated"
+                            className="col-span-3"
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <label className="text-right text-sm font-medium">Teaching Method</label>
+                          <Input
+                            value={newPlanItem.teachingMethod}
+                            onChange={(e) => setNewPlanItem({...newPlanItem, teachingMethod: e.target.value})}
+                            placeholder="E.g. Lecture, Lab, Discussion"
+                            className="col-span-3"
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <label className="text-right text-sm font-medium">CO Reference</label>
+                          <Input
+                            value={newPlanItem.coReference}
+                            onChange={(e) => setNewPlanItem({...newPlanItem, coReference: e.target.value})}
+                            placeholder="E.g. CO1, CO2"
+                            className="col-span-3"
+                          />
+                        </div>
+                        <div className="grid grid-cols-4 items-center gap-4">
+                          <label className="text-right text-sm font-medium">Resources</label>
+                          <Textarea
+                            value={newPlanItem.resources}
+                            onChange={(e) => setNewPlanItem({...newPlanItem, resources: e.target.value})}
+                            placeholder="Resources, comma separated"
+                            className="col-span-3"
+                          />
+                        </div>
+                      </div>
+                      <DialogFooter>
+                        <Button variant="outline" onClick={() => setIsAddingPlanItem(false)}>Cancel</Button>
+                        <Button 
+                          onClick={handleAddPlanItem}
+                          disabled={!newPlanItem.topic || !newPlanItem.week}
+                        >
+                          Add Item
+                        </Button>
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </TabsContent>
               
               <TabsContent value="feedback">
