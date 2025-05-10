@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import {
   Card,
@@ -49,7 +48,7 @@ import {
 } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 import { format } from "date-fns"
-import { CalendarIcon } from "lucide-react"
+import { CalendarIcon, Plus, Trash } from "lucide-react"
 import {
   Command,
   CommandEmpty,
@@ -152,6 +151,13 @@ interface Student {
   usn: string;
   email: string;
   phone: string;
+}
+
+// New interface for Course Outcomes
+interface CourseOutcome {
+  id: string;
+  description: string;
+  bloomLevel: string;
 }
 
 const SubjectBuilder = () => {
@@ -410,120 +416,298 @@ const SubjectBuilder = () => {
   const [isEditCoPoMappingDialogOpen, setIsEditCoPoMappingDialogOpen] = useState(false);
   const [editedCoPoMapping, setEditedCoPoMapping] = useState<any | null>(null);
   const [isCourseOutcomesDialogOpen, setIsCourseOutcomesDialogOpen] = useState(false);
-  const [courseOutcomes, setCourseOutcomes] = useState([
-    { id: '1', description: 'Course Outcome 1' },
-    { id: '2', description: 'Course Outcome 2' },
+  const [courseOutcomes, setCourseOutcomes] = useState<CourseOutcome[]>([
+    { id: 'CO1', description: 'Describe the fundamental principles', bloomLevel: 'Level 2 - Remember' }
   ]);
-  const [isEditCourseOutcomesDialogOpen, setIsEditCourseOutcomesDialogOpen] = useState(false);
-  const [editedCourseOutcomes, setEditedCourseOutcomes] = useState<any | null>(null);
-  const [isProgramOutcomesDialogOpen, setIsProgramOutcomesDialogOpen] = useState(false);
-  const [programOutcomes, setProgramOutcomes] = useState([
-    { id: '1', description: 'Program Outcome 1' },
-    { id: '2', description: 'Program Outcome 2' },
-  ]);
-  const [isEditProgramOutcomesDialogOpen, setIsEditProgramOutcomesDialogOpen] = useState(false);
-  const [editedProgramOutcomes, setEditedProgramOutcomes] = useState<any | null>(null);
-  const [isAssessmentsDialogOpen, setIsAssessmentsDialogOpen] = useState(false);
-  const [assessments, setAssessments] = useState([
-    { id: '1', title: 'Assessment 1', totalMarks: 100 },
-    { id: '2', title: 'Assessment 2', totalMarks: 100 },
-  ]);
-  const [isEditAssessmentsDialogOpen, setIsEditAssessmentsDialogOpen] = useState(false);
-  const [editedAssessments, setEditedAssessments] = useState<any | null>(null);
-  const [isRubricsDialogOpen, setIsRubricsDialogOpen] = useState(false);
-  const [rubrics, setRubrics] = useState([
-    { id: '1', title: 'Rubric 1', description: 'Description for Rubric 1' },
-    { id: '2', title: 'Rubric 2', description: 'Description for Rubric 2' },
-  ]);
-  const [isEditRubricsDialogOpen, setIsEditRubricsDialogOpen] = useState(false);
-  const [editedRubrics, setEditedRubrics] = useState<any | null>(null);
-  const [isBloomTaxonomyDialogOpen, setIsBloomTaxonomyDialogOpen] = useState(false);
-  const [bloomTaxonomy, setBloomTaxonomy] = useState([
-    { id: '1', level: 'Level 1', description: 'Description for Level 1' },
-    { id: '2', level: 'Level 2', description: 'Description for Level 2' },
-  ]);
-  const [isEditBloomTaxonomyDialogOpen, setIsEditBloomTaxonomyDialogOpen] = useState(false);
-  const [editedBloomTaxonomy, setEditedBloomTaxonomy] = useState<any | null>(null);
-  const [isLearningObjectivesDialogOpen, setIsLearningObjectivesDialogOpen] = useState(false);
-  const [learningObjectives, setLearningObjectives] = useState([
-    { id: '1', description: 'Learning Objective 1' },
-    { id: '2', description: 'Learning Objective 2' },
-  ]);
-  const [isEditLearningObjectivesDialogOpen, setIsEditLearningObjectivesDialogOpen] = useState(false);
-  const [editedLearningObjectives, setEditedLearningObjectives] = useState<any | null>(null);
-  const [isTeachingMethodsDialogOpen, setIsTeachingMethodsDialogOpen] = useState(false);
-  const [teachingMethods, setTeachingMethods] = useState([
-    { id: '1', method: 'Method 1', description: 'Description for Method 1' },
-    { id: '2', method: 'Method 2', description: 'Description for Method 2' },
-  ]);
-  const [isEditTeachingMethodsDialogOpen, setIsEditTeachingMethodsDialogOpen] = useState(false);
-  const [editedTeachingMethods, setEditedTeachingMethods] = useState<any | null>(null);
-  const [isLearningActivitiesDialogOpen, setIsLearningActivitiesDialogOpen] = useState(false);
-  const [learningActivities, setLearningActivities] = useState([
-    { id: '1', activity: 'Activity 1', description: 'Description for Activity 1' },
-    { id: '2', activity: 'Activity 2', description: 'Description for Activity 2' },
-  ]);
-  const [isEditLearningActivitiesDialogOpen, setIsEditLearningActivitiesDialogOpen] = useState(false);
-  const [editedLearningActivities, setEditedLearningActivities] = useState<any | null>(null);
-  const [isLearningResourcesDialogOpen, setIsLearningResourcesDialogOpen] = useState(false);
-  const [learningResources, setLearningResources] = useState([
-    { id: '1', resource: 'Resource 1', description: 'Description for Resource 1' },
-    { id: '2', resource: 'Resource 2', description: 'Description for Resource 2' },
-  ]);
-  const [isEditLearningResourcesDialogOpen, setIsEditLearningResourcesDialogOpen] = useState(false);
-  const [editedLearningResources, setEditedLearningResources] = useState<any | null>(null);
-  const [isAssessmentMethodsDialogOpen, setIsAssessmentMethodsDialogOpen] = useState(false);
-  const [assessmentMethods, setAssessmentMethods] = useState([
-    { id: '1', method: 'Method 1', description: 'Description for Method 1' },
-    { id: '2', method: 'Method 2', description: 'Description for Method 2' },
-  ]);
-  const [isEditAssessmentMethodsDialogOpen, setIsEditAssessmentMethodsDialogOpen] = useState(false);
-  const [editedAssessmentMethods, setEditedAssessmentMethods] = useState<any | null>(null);
-  const [isFeedbackMethodsDialogOpen, setIsFeedbackMethodsDialogOpen] = useState(false);
-  const [feedbackMethods, setFeedbackMethods] = useState([
-    { id: '1', method: 'Method 1', description: 'Description for Method 1' },
-    { id: '2', method: 'Method 2', description: 'Description for Method 2' },
-  ]);
-  const [isEditFeedbackMethodsDialogOpen, setIsEditFeedbackMethodsDialogOpen] = useState(false);
-  const [editedFeedbackMethods, setEditedFeedbackMethods] = useState<any | null>(null);
-  const [isGradingCriteriaDialogOpen, setIsGradingCriteriaDialogOpen] = useState(false);
-  const [gradingCriteria, setGradingCriteria] = useState([
-    { id: '1', criteria: 'Criteria 1', description: 'Description for Criteria 1' },
-    { id: '2', criteria: 'Criteria 2', description: 'Description for Criteria 2' },
-  ]);
-  const [isEditGradingCriteriaDialogOpen, setIsEditGradingCriteriaDialogOpen] = useState(false);
-  const [editedGradingCriteria, setEditedGradingCriteria] = useState<any | null>(null);
-  const [isCoursePoliciesDialogOpen, setIsCoursePoliciesDialogOpen] = useState(false);
-  const [coursePolicies, setCoursePolicies] = useState([
-    { id: '1', policy: 'Policy 1', description: 'Description for Policy 1' },
-    { id: '2', policy: 'Policy 2', description: 'Description for Policy 2' },
-  ]);
-  const [isEditCoursePoliciesDialogOpen, setIsEditCoursePoliciesDialogOpen] = useState(false);
-  const [editedCoursePolicies, setEditedCoursePolicies] = useState<any | null>(null);
-  const [isAcademicIntegrityDialogOpen, setIsAcademicIntegrityDialogOpen] = useState(false);
-  const [academicIntegrity, setAcademicIntegrity] = useState([
-    { id: '1', policy: 'Policy 1', description: 'Description for Policy 1' },
-    { id: '2', policy: 'Policy 2', description: 'Description for Policy 2' },
-  ]);
-  const [isEditAcademicIntegrityDialogOpen, setIsEditAcademicIntegrityDialogOpen] = useState(false);
-  const [editedAcademicIntegrity, setEditedAcademicIntegrity] = useState<any | null>(null);
-  const [isDisabilityServicesDialogOpen, setIsDisabilityServicesDialogOpen] = useState(false);
-  const [disabilityServices, setDisabilityServices] = useState([
-    { id: '1', service: 'Service 1', description: 'Description for Service 1' },
-    { id: '2', service: 'Service 2', description: 'Description for Service 2' },
-  ]);
-  const [isEditDisabilityServicesDialogOpen, setIsEditDisabilityServicesDialogOpen] = useState(false);
-  const [editedDisabilityServices, setEditedDisabilityServices] = useState<any | null>(null);
-  const [isReligiousAccommodationsDialogOpen, setIsReligiousAccommodationsDialogOpen] = useState(false);
-  const [religiousAccommodations, setReligiousAccommodations] = useState([
-    { id: '1', accommodation: 'Accommodation 1', description: 'Description for Accommodation 1' },
-    { id: '2', accommodation: 'Accommodation 2', description: 'Description for Accommodation 2' },
-  ]);
+  
+  const [newCourseOutcome, setNewCourseOutcome] = useState<Omit<CourseOutcome, 'id'>>({
+    description: '',
+    bloomLevel: 'Level 2 - Remember'
+  });
+  
+  const [isCourseOutcomeDialogOpen, setIsCourseOutcomeDialogOpen] = useState(false);
+  const [isEditCourseOutcomeDialogOpen, setIsEditCourseOutcomeDialogOpen] = useState(false);
+  const [editedCourseOutcome, setEditedCourseOutcome] = useState<CourseOutcome | null>(null);
+  const [isDeleteCourseOutcomeDialogOpen, setIsDeleteCourseOutcomeDialogOpen] = useState(false);
+  const [courseOutcomeToDelete, setCourseOutcomeToDelete] = useState<string | null>(null);
+
+  // Bloom's Taxonomy levels
+  const bloomLevels = [
+    'Level 1 - Understand',
+    'Level 2 - Remember',
+    'Level 3 - Apply',
+    'Level 4 - Analyze'
+  ];
+
+  const handleAddCourseOutcome = () => {
+    if (!newCourseOutcome.description.trim()) {
+      toast.error('Please provide a description for the Course Outcome');
+      return;
+    }
+
+    const nextId = `CO${courseOutcomes.length + 1}`;
+    setCourseOutcomes([...courseOutcomes, { 
+      ...newCourseOutcome, 
+      id: nextId
+    }]);
+    
+    setNewCourseOutcome({
+      description: '',
+      bloomLevel: 'Level 2 - Remember'
+    });
+    
+    setIsCourseOutcomeDialogOpen(false);
+    toast.success(`Course Outcome ${nextId} added successfully`);
+  };
+
+  const handleEditCourseOutcome = () => {
+    if (!editedCourseOutcome) return;
+    
+    if (!editedCourseOutcome.description.trim()) {
+      toast.error('Please provide a description for the Course Outcome');
+      return;
+    }
+
+    setCourseOutcomes(courseOutcomes.map(co => 
+      co.id === editedCourseOutcome.id ? editedCourseOutcome : co
+    ));
+    
+    setIsEditCourseOutcomeDialogOpen(false);
+    toast.success(`Course Outcome ${editedCourseOutcome.id} updated successfully`);
+  };
+
+  const handleDeleteCourseOutcome = () => {
+    if (!courseOutcomeToDelete) return;
+    
+    setCourseOutcomes(courseOutcomes.filter(co => co.id !== courseOutcomeToDelete));
+    setIsDeleteCourseOutcomeDialogOpen(false);
+    toast.success(`Course Outcome removed successfully`);
+  };
 
   return (
-    <div>
-      <h1>Subject Builder</h1>
-      <div>Content goes here</div>
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6">Subject Builder</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Course Outcomes & Bloom's Level Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Course Outcome & Bloom's Level</CardTitle>
+            <CardDescription>
+              Define course outcomes and their corresponding Bloom's taxonomy levels
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-medium">Course Outcomes</h3>
+                <Dialog open={isCourseOutcomeDialogOpen} onOpenChange={setIsCourseOutcomeDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" size="sm">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add CO
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Add Course Outcome</DialogTitle>
+                      <DialogDescription>
+                        Define a new course outcome and select its Bloom's taxonomy level.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="co-description">Description</Label>
+                        <Textarea
+                          id="co-description"
+                          placeholder="Enter course outcome description"
+                          value={newCourseOutcome.description}
+                          onChange={(e) => setNewCourseOutcome({
+                            ...newCourseOutcome,
+                            description: e.target.value
+                          })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="bloom-level">Bloom's Taxonomy Level</Label>
+                        <Select 
+                          value={newCourseOutcome.bloomLevel}
+                          onValueChange={(value) => setNewCourseOutcome({
+                            ...newCourseOutcome,
+                            bloomLevel: value
+                          })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select a level" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {bloomLevels.map((level) => (
+                              <SelectItem key={level} value={level}>
+                                {level}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-3">
+                      <Button variant="outline" onClick={() => setIsCourseOutcomeDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button onClick={handleAddCourseOutcome}>
+                        Add Course Outcome
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
+              
+              {courseOutcomes.length > 0 ? (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>CO ID</TableHead>
+                      <TableHead>Description</TableHead>
+                      <TableHead>Bloom's Level</TableHead>
+                      <TableHead>Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {courseOutcomes.map((outcome) => (
+                      <TableRow key={outcome.id}>
+                        <TableCell className="font-medium">{outcome.id}</TableCell>
+                        <TableCell>{outcome.description}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline">{outcome.bloomLevel}</Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex space-x-2">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setEditedCourseOutcome(outcome);
+                                setIsEditCourseOutcomeDialogOpen(true);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="text-red-500 hover:text-red-700"
+                              onClick={() => {
+                                setCourseOutcomeToDelete(outcome.id);
+                                setIsDeleteCourseOutcomeDialogOpen(true);
+                              }}
+                            >
+                              Delete
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              ) : (
+                <div className="text-center p-4 border rounded-md bg-muted/50">
+                  <p className="text-muted-foreground">No course outcomes defined yet.</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+        
+        {/* Other cards would go here */}
+      </div>
+      
+      {/* Dialog for editing course outcome */}
+      <Dialog open={isEditCourseOutcomeDialogOpen} onOpenChange={setIsEditCourseOutcomeDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Course Outcome</DialogTitle>
+            <DialogDescription>
+              Update the course outcome and its Bloom's taxonomy level.
+            </DialogDescription>
+          </DialogHeader>
+          {editedCourseOutcome && (
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="edit-co-id">CO ID</Label>
+                <Input
+                  id="edit-co-id"
+                  value={editedCourseOutcome.id}
+                  disabled
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-co-description">Description</Label>
+                <Textarea
+                  id="edit-co-description"
+                  placeholder="Enter course outcome description"
+                  value={editedCourseOutcome.description}
+                  onChange={(e) => setEditedCourseOutcome({
+                    ...editedCourseOutcome,
+                    description: e.target.value
+                  })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="edit-bloom-level">Bloom's Taxonomy Level</Label>
+                <Select 
+                  value={editedCourseOutcome.bloomLevel}
+                  onValueChange={(value) => setEditedCourseOutcome({
+                    ...editedCourseOutcome,
+                    bloomLevel: value
+                  })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {bloomLevels.map((level) => (
+                      <SelectItem key={level} value={level}>
+                        {level}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <div className="flex justify-end gap-3">
+            <Button variant="outline" onClick={() => setIsEditCourseOutcomeDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleEditCourseOutcome}>
+              Update
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Delete confirmation dialog */}
+      <AlertDialog 
+        open={isDeleteCourseOutcomeDialogOpen} 
+        onOpenChange={setIsDeleteCourseOutcomeDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the course outcome. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setIsDeleteCourseOutcomeDialogOpen(false)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteCourseOutcome} className="bg-red-600 hover:bg-red-700">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
