@@ -484,6 +484,17 @@ const SubjectBuilder = () => {
     toast.success(`Course Outcome removed successfully`);
   };
 
+  useEffect(() => {
+    localStorage.setItem('courseOutcomes', JSON.stringify(courseOutcomes));
+  }, [courseOutcomes]);
+
+  useEffect(() => {
+    const savedCourseOutcomes = localStorage.getItem('courseOutcomes');
+    if (savedCourseOutcomes) {
+      setCourseOutcomes(JSON.parse(savedCourseOutcomes));
+    }
+  }, []);
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-6">Subject Builder</h1>
@@ -640,76 +651,4 @@ const SubjectBuilder = () => {
                   disabled
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-co-description">Description</Label>
-                <Textarea
-                  id="edit-co-description"
-                  placeholder="Enter course outcome description"
-                  value={editedCourseOutcome.description}
-                  onChange={(e) => setEditedCourseOutcome({
-                    ...editedCourseOutcome,
-                    description: e.target.value
-                  })}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="edit-bloom-level">Bloom's Taxonomy Level</Label>
-                <Select 
-                  value={editedCourseOutcome.bloomLevel}
-                  onValueChange={(value) => setEditedCourseOutcome({
-                    ...editedCourseOutcome,
-                    bloomLevel: value
-                  })}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {bloomLevels.map((level) => (
-                      <SelectItem key={level} value={level}>
-                        {level}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          )}
-          <div className="flex justify-end gap-3">
-            <Button variant="outline" onClick={() => setIsEditCourseOutcomeDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleEditCourseOutcome}>
-              Update
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-      
-      {/* Delete confirmation dialog */}
-      <AlertDialog 
-        open={isDeleteCourseOutcomeDialogOpen} 
-        onOpenChange={setIsDeleteCourseOutcomeDialogOpen}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete the course outcome. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setIsDeleteCourseOutcomeDialogOpen(false)}>
-              Cancel
-            </AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteCourseOutcome} className="bg-red-600 hover:bg-red-700">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
-};
-
-export default SubjectBuilder;
+              <div
